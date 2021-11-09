@@ -24,9 +24,20 @@ public class MemberService {
      */
     public Long join(Member member) {
 
-        validateDuplicateMember(member);  //중복 회원 검증
-        memberRepository.save(member);
-        return member.getId();
+        // 시간을 측정하는 로직은 공통관심사항으로 핵심관심사항이 아니다.
+        // 이 경우 핵심기능과 섞여 유지보수가 어려워진다.
+        // AOP를 통해 한번에 해결이 가능
+        long start = System.currentTimeMillis();
+
+        try {
+            validateDuplicateMember(member);  //중복 회원 검증
+            memberRepository.save(member);
+            return member.getId();
+        } finally {
+            long finish = System.currentTimeMillis();
+            long timeMs = finish - start;
+            System.out.println("join = " + timeMs + "ms");
+        }
     }
 
     private void validateDuplicateMember(Member member){
